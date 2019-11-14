@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="isTouchXSource" format="boolean"/>
-    <attr name="isTouchYSource" format="boolean"/>
-
+    <attr name="sourceMode" format="enum">
+        <enum value="0" name="notSource"/>
+        <enum value="1" name="x"/>
+        <enum value="2" name="y"/>
+        <enum value="3" name="xy"/>
+    </attr>
+    <attr name="syncMode" format="enum">
+        <enum value="0" name="notSync"/>
+        <enum value="1" name="x"/>
+        <enum value="2" name="y"/>
+        <enum value="3" name="xy"/>
+    </attr>
     <declare-styleable name="SynchronizedListView">
-        <attr name="isTouchXSource"/>
-        <attr name="isTouchYSource"/>
+        <attr name="sourceMode"/>
+        <attr name="syncMode"/>
     </declare-styleable>
 </resources>

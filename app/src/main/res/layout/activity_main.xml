@@ -40,15 +40,15 @@
             android:id="@+id/listview_left"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            app:sourceMode="xy"/>
 
         <com.hoverdroids.sync.listviews.SynchronizedListView
             android:id="@+id/listview_center"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            app:isTouchXSource="false"
-            app:isTouchYSource="false"/>
+            app:sourceMode="notSource"/>
 
         <com.hoverdroids.sync.listviews.SynchronizedListView
             android:id="@+id/listview_right"

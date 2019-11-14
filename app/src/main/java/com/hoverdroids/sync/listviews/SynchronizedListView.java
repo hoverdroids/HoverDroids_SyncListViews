@@ -7,10 +7,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
 
+import static com.hoverdroids.sync.listviews.SourceMode.NOT_SOURCE;
+
 public class SynchronizedListView extends ListView implements SyncTouchView{
 
-    private boolean isTouchXSource = true;
-    private boolean isTouchYSource = true;
+    private SourceMode sourceMode = SourceMode.XY;
+    private SyncMode syncMode = SyncMode.XY;
 
     private OnSyncTouchEventListener onSyncTouchEventListener;
 
@@ -22,20 +24,20 @@ public class SynchronizedListView extends ListView implements SyncTouchView{
 
     public SynchronizedListView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initCustomAttrs(attrs,0, 0);
+        readCustomAttrs(attrs,0, 0);
     }
 
     public SynchronizedListView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initCustomAttrs(attrs, defStyleAttr, 0);
+        readCustomAttrs(attrs, defStyleAttr, 0);
     }
 
     public SynchronizedListView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        initCustomAttrs(attrs, defStyleAttr, defStyleRes);
+        readCustomAttrs(attrs, defStyleAttr, defStyleRes);
     }
 
-    private void initCustomAttrs(AttributeSet attrs, int defStyleAttr, int defStyleRes){
+    private void readCustomAttrs(AttributeSet attrs, int defStyleAttr, int defStyleRes){
         if (attrs == null){
             return;
         }
@@ -43,8 +45,11 @@ public class SynchronizedListView extends ListView implements SyncTouchView{
         final Context context = getContext();
         final TypedArray ary = context.obtainStyledAttributes(attrs, R.styleable.SynchronizedListView, defStyleAttr, defStyleRes);
 
-        isTouchXSource = ary.getBoolean(R.styleable.SynchronizedListView_isTouchXSource, true);
-        isTouchYSource = ary.getBoolean(R.styleable.SynchronizedListView_isTouchYSource ,true);
+        int mode = ary.getInt(R.styleable.SynchronizedListView_sourceMode, SourceMode.XY.ordinal());
+        sourceMode = SourceMode.values()[mode];
+
+        mode = ary.getInt(R.styleable.SynchronizedListView_syncMode, SyncMode.XY.ordinal());
+        syncMode = SyncMode.values()[mode];
 
         ary.recycle();
     }
@@ -52,7 +57,7 @@ public class SynchronizedListView extends ListView implements SyncTouchView{
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         //Only relay touch events that are actually on this view
-        if (onSyncTouchEventListener != null && (isTouchXSource || isTouchYSource) && !isSyncTouchEvent){
+        if (onSyncTouchEventListener != null && !sourceMode.equals(NOT_SOURCE) && !isSyncTouchEvent){
 
             //Send touch event data in X, Y, or both. This allows the output to easily be filtered
             //in a single direction - ie avoids the need to determine how much movement in an axis
@@ -62,8 +67,9 @@ public class SynchronizedListView extends ListView implements SyncTouchView{
             if (ev.getHistorySize() > 1) {
                 final float origX = ev.getHistoricalX(0, 0);
                 final float origY = ev.getHistoricalX(0, 0);
-                final float x = isTouchXSource ? ev.getX() : origX;
-                final float y = isTouchXSource ? ev.getY() : origY;
+
+                float x = SourceMode.X.equals(sourceMode) || SourceMode.XY.equals(sourceMode) ? ev.getX() : origX;
+                float y = SourceMode.Y.equals(sourceMode) || SourceMode.XY.equals(sourceMode) ? ev.getY() : origY;
 
                 clonedEvent.setLocation(x, y);
             }
@@ -107,19 +113,19 @@ public class SynchronizedListView extends ListView implements SyncTouchView{
         this.onSyncTouchEventListener = onSyncTouchEventListener;
     }
 
-    public boolean isTouchXSource() {
-        return isTouchXSource;
+    public SourceMode getSourceMode() {
+        return sourceMode;
     }
 
-    public void setTouchXSource(boolean touchXSource) {
-        isTouchXSource = touchXSource;
+    public void setSourceMode(SourceMode sourceMode) {
+        this.sourceMode = sourceMode;
     }
 
-    public boolean isTouchYSource() {
-        return isTouchYSource;
+    public SyncMode getSyncMode() {
+        return syncMode;
     }
 
-    public void setTouchYSource(boolean touchYSource) {
-        isTouchYSource = touchYSource;
+    public void setSyncMode(SyncMode syncMode) {
+        this.syncMode = syncMode;
     }
 }
