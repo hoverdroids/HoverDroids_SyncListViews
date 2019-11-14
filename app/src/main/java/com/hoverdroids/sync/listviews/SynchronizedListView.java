@@ -1,6 +1,8 @@
 package com.hoverdroids.sync.listviews;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,6 +22,7 @@ public class SynchronizedListView extends ListView implements SyncTouchView{
 
     public SynchronizedListView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        initCustomAttrs(attrs,0, 0);
     }
 
     public SynchronizedListView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -28,6 +31,20 @@ public class SynchronizedListView extends ListView implements SyncTouchView{
 
     public SynchronizedListView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        initCustomAttrs(attrs, defStyleAttr, defStyleRes);
+    }
+
+    private void initCustomAttrs(AttributeSet attrs, int defStyleAttr, int defStyleRes){
+        if (attrs == null){
+            return;
+        }
+
+        final Context context = getContext();
+        final TypedArray ary = context.obtainStyledAttributes(attrs, R.styleable.SynchronizedListView, defStyleAttr, defStyleRes);
+
+        isSyncTouchSource = ary.getBoolean(R.styleable.SynchronizedListView_isSyncSource, true);
+
+        ary.recycle();
     }
 
     @Override

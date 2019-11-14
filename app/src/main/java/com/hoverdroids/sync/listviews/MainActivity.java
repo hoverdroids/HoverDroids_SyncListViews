@@ -20,11 +20,14 @@ public class MainActivity extends AppCompatActivity implements OnSyncTouchEventL
     @BindView(R.id.listview_left)
     SynchronizedListView leftListView;
 
+    @BindView(R.id.listview_center)
+    SynchronizedListView centerListView;
+
     @BindView(R.id.listview_right)
     SynchronizedListView rightListView;
 
     private BaseAdapter leftAdapter;
-
+    private BaseAdapter centerAdapter;
     private BaseAdapter rightAdapter;
 
     @Override
@@ -38,6 +41,10 @@ public class MainActivity extends AppCompatActivity implements OnSyncTouchEventL
         leftListView.setAdapter(leftAdapter);
         leftListView.setOnSyncTouchEventListener(this);
 
+        centerAdapter = new SimpleAdapter(getApplicationContext(), getItems());
+        centerListView.setAdapter(centerAdapter);
+        centerListView.setOnSyncTouchEventListener(this);
+
         rightAdapter = new SimpleAdapter(getApplicationContext(), getItems());
         rightListView.setAdapter(rightAdapter);
         rightListView.setOnSyncTouchEventListener(this);
@@ -46,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements OnSyncTouchEventL
     @Override
     public void onSyncTouchEvent(View sourceView, MotionEvent ev) {
         leftListView.onTouchEvent(sourceView, ev);
+        centerListView.onTouchEvent(sourceView, ev);
         rightListView.onTouchEvent(sourceView, ev);
     }
 

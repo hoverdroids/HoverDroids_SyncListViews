@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="isSyncSource" format="boolean"/>
+
+    <declare-styleable name="SynchronizedListView">
+        <attr name="isSyncSource"/>
+    </declare-styleable>
+</resources>
