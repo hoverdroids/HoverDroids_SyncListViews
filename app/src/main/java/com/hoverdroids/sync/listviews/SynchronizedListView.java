@@ -56,7 +56,8 @@ public class SynchronizedListView extends ListView implements SyncTouchView{
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        //Only relay touch events that are actually on this view
+        //Only relay touch events that are actually on this view. Avoid sending touch events
+        //coming from a source because that will create an infinite loop of MotionEvents
         if (onSyncTouchEventListener != null && !sourceMode.equals(NOT_SOURCE) && !isSyncTouchEvent){
 
             //Send touch event data in X, Y, or both. This allows the output to easily be filtered
@@ -88,12 +89,29 @@ public class SynchronizedListView extends ListView implements SyncTouchView{
 
     @Override
     public void onTouchEvent(View sourceView, MotionEvent ev) {
-        if (sourceView.equals(this))
+        if (sourceView.equals(this) || SyncMode.NOT_SYNC.equals(syncMode))
         {
             return;
         }
+
+        //Accept touch event data in X, Y, or both. This allows the input to easily be filtered
+        //in a single direction - ie avoids the need to determine how much movement in an axis
+        //we don't care to sync.
+        final MotionEvent clonedEvent = MotionEvent.obtain(ev);
+
+        if (ev.getHistorySize() > 1) {
+            final float origX = ev.getHistoricalX(0, 0);
+            final float origY = ev.getHistoricalX(0, 0);
+
+            float x = SyncMode.X.equals(syncMode) || SyncMode.XY.equals(syncMode) ? ev.getX() : origX;
+            float y = SyncMode.Y.equals(syncMode) || SyncMode.XY.equals(syncMode) ? ev.getY() : origY;
+
+            clonedEvent.setLocation(x, y);
+        }
+
         isSyncTouchEvent = true;
         onTouchEvent(ev);
+        clonedEvent.recycle();
         isSyncTouchEvent = false;
     }
 
