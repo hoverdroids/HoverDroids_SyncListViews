@@ -2,7 +2,6 @@ package com.hoverdroids.sync.listviews;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -10,7 +9,8 @@ import android.widget.ListView;
 
 public class SynchronizedListView extends ListView implements SyncTouchView{
 
-    private boolean isSyncTouchSource = true;
+    private boolean isTouchXSource = true;
+    private boolean isTouchYSource = true;
 
     private OnSyncTouchEventListener onSyncTouchEventListener;
 
@@ -27,6 +27,7 @@ public class SynchronizedListView extends ListView implements SyncTouchView{
 
     public SynchronizedListView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        initCustomAttrs(attrs, defStyleAttr, 0);
     }
 
     public SynchronizedListView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -42,7 +43,8 @@ public class SynchronizedListView extends ListView implements SyncTouchView{
         final Context context = getContext();
         final TypedArray ary = context.obtainStyledAttributes(attrs, R.styleable.SynchronizedListView, defStyleAttr, defStyleRes);
 
-        isSyncTouchSource = ary.getBoolean(R.styleable.SynchronizedListView_isSyncSource, true);
+        isTouchXSource = ary.getBoolean(R.styleable.SynchronizedListView_isTouchXSource, true);
+        isTouchYSource = ary.getBoolean(R.styleable.SynchronizedListView_isTouchYSource ,true);
 
         ary.recycle();
     }
@@ -50,8 +52,24 @@ public class SynchronizedListView extends ListView implements SyncTouchView{
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         //Only relay touch events that are actually on this view
-        if (onSyncTouchEventListener != null && isSyncTouchSource && !isSyncTouchEvent){
+        if (onSyncTouchEventListener != null && (isTouchXSource || isTouchYSource) && !isSyncTouchEvent){
+
+            //Send touch event data in X, Y, or both. This allows the output to easily be filtered
+            //in a single direction - ie avoids the need to determine how much movement in an axis
+            //we don't care to sync.
+            final MotionEvent clonedEvent = MotionEvent.obtain(ev);
+
+            if (ev.getHistorySize() > 1) {
+                final float origX = ev.getHistoricalX(0, 0);
+                final float origY = ev.getHistoricalX(0, 0);
+                final float x = isTouchXSource ? ev.getX() : origX;
+                final float y = isTouchXSource ? ev.getY() : origY;
+
+                clonedEvent.setLocation(x, y);
+            }
+
             onSyncTouchEventListener.onSyncTouchEvent(this, ev);
+            clonedEvent.recycle();
         }
 
         //Handle the touch event as though the user made it on this view
@@ -89,11 +107,19 @@ public class SynchronizedListView extends ListView implements SyncTouchView{
         this.onSyncTouchEventListener = onSyncTouchEventListener;
     }
 
-    public boolean isSyncTouchSource() {
-        return isSyncTouchSource;
+    public boolean isTouchXSource() {
+        return isTouchXSource;
     }
 
-    public void setSyncTouchSource(boolean syncTouchSource) {
-        isSyncTouchSource = syncTouchSource;
+    public void setTouchXSource(boolean touchXSource) {
+        isTouchXSource = touchXSource;
+    }
+
+    public boolean isTouchYSource() {
+        return isTouchYSource;
+    }
+
+    public void setTouchYSource(boolean touchYSource) {
+        isTouchYSource = touchYSource;
     }
 }

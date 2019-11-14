@@ -14,6 +14,8 @@ import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import timber.log.Timber;
+import timber.log.Timber.DebugTree;
 
 public class MainActivity extends AppCompatActivity implements OnSyncTouchEventListener {
 
@@ -37,6 +39,10 @@ public class MainActivity extends AppCompatActivity implements OnSyncTouchEventL
 
         ButterKnife.bind(this);
 
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new DebugTree());
+        }
+
         leftAdapter = new SimpleAdapter(getApplicationContext(), getItems());
         leftListView.setAdapter(leftAdapter);
         leftListView.setOnSyncTouchEventListener(this);
@@ -57,11 +63,11 @@ public class MainActivity extends AppCompatActivity implements OnSyncTouchEventL
         rightListView.onTouchEvent(sourceView, ev);
     }
 
-    private List<SimpleItem> getItems(){
+    private List<SimpleItem> getItems() {
         final Random rnd = new Random();
 
         final List<SimpleItem> items = new ArrayList<>();
-        for (int i = 0; i < 20; i++){
+        for (int i = 0; i < 20; i++) {
             final int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
             items.add(new SimpleItem(color));
         }

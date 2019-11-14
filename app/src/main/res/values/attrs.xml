@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="isSyncSource" format="boolean"/>
+    <attr name="isTouchXSource" format="boolean"/>
+    <attr name="isTouchYSource" format="boolean"/>
 
     <declare-styleable name="SynchronizedListView">
-        <attr name="isSyncSource"/>
+        <attr name="isTouchXSource"/>
+        <attr name="isTouchYSource"/>
     </declare-styleable>
 </resources>
